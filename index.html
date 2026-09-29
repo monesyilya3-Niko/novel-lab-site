@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>暮冬念春 · 网文创作工作台</title>
+<meta name="description" content="暮冬念春——把优秀小说拆成可复用的结构化资产，再用这些资产驱动 AI 辅助创作。本地优先的 Windows 桌面软件，MIT 开源免费。">
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-soft:#f7f7f8;
+    --text:#17181c;
+    --muted:#6b7280;
+    --line:#e8e8ea;
+    --accent:#2450c8;
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Source Han Sans SC",sans-serif;
+    color:var(--text);background:var(--bg);line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  a{color:inherit}
+
+  /* 导航 */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.88);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{font-size:19px;font-weight:700;letter-spacing:.06em;text-decoration:none}
+  .brand small{font-weight:400;color:var(--muted);font-size:12px;letter-spacing:.02em;margin-left:8px}
+  .nav-links{display:flex;gap:28px;align-items:center}
+  .nav-links a{text-decoration:none;font-size:14px;color:var(--muted);transition:color .2s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-links .gh{
+    border:1px solid var(--line);border-radius:999px;padding:6px 16px;
+    color:var(--text);font-weight:500;
+  }
+  .nav-links .gh:hover{border-color:var(--text)}
+  .menu-btn{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text)}
+
+  /* Hero */
+  .hero{padding:110px 0 84px;text-align:center}
+  .badge{
+    display:inline-block;font-size:13px;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:6px 18px;margin-bottom:28px;
+    background:var(--bg-soft);
+  }
+  .hero h1{font-size:60px;font-weight:800;letter-spacing:.12em;margin-bottom:20px}
+  .hero .tagline{font-size:19px;color:var(--muted);max-width:640px;margin:0 auto 12px}
+  .hero .sub{font-size:14px;color:var(--muted);margin-bottom:40px}
+  .btn-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    display:inline-block;text-decoration:none;font-size:16px;font-weight:600;
+    padding:14px 34px;border-radius:12px;transition:transform .15s,box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn-primary{background:var(--text);color:#fff}
+  .btn-primary:hover{box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .btn-ghost{border:1px solid var(--line);color:var(--text);background:#fff}
+  .btn-ghost:hover{border-color:var(--text)}
+
+  /* 数据条 */
+  .stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-soft)}
+  .stats-inner{display:flex;justify-content:space-between;flex-wrap:wrap;padding:34px 0}
+  .stat{flex:1 1 160px;text-align:center;padding:8px 12px}
+  .stat .num{font-size:30px;font-weight:800;color:var(--accent);letter-spacing:.02em}
+  .stat .lbl{font-size:13px;color:var(--muted);margin-top:4px}
+
+  section{padding:96px 0}
+  section.alt{background:var(--bg-soft)}
+  .sec-head{text-align:center;margin-bottom:56px}
+  .sec-head h2{font-size:34px;font-weight:700;letter-spacing:.08em;margin-bottom:12px}
+  .sec-head p{color:var(--muted);font-size:16px;max-width:620px;margin:0 auto}
+
+  /* 功能卡片 */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:32px 28px;transition:transform .18s,box-shadow .18s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.07)}
+  .card .icon{font-size:30px;margin-bottom:16px}
+  .card h3{font-size:18px;font-weight:700;margin-bottom:10px}
+  .card p{font-size:14px;color:var(--muted);line-height:1.8}
+
+  /* 工作流 */
+  .flow{display:flex;align-items:stretch;justify-content:space-between;gap:0;flex-wrap:wrap}
+  .step{flex:1 1 0;min-width:140px;text-align:center;padding:0 8px;position:relative}
+  .step .n{
+    width:46px;height:46px;margin:0 auto 14px;border-radius:50%;
+    background:var(--text);color:#fff;font-weight:700;font-size:17px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step h4{font-size:15px;font-weight:700;margin-bottom:6px}
+  .step p{font-size:12.5px;color:var(--muted);line-height:1.7}
+  .step:not(:last-child)::after{
+    content:"→";position:absolute;right:-14px;top:8px;
+    color:#c9ccd3;font-size:22px;
+  }
+
+  /* 截图 */
+  .shots{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  figure.shot{
+    border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff;
+  }
+  figure.shot .frame{
+    background:var(--bg-soft);min-height:280px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  figure.shot img{width:100%;height:auto;display:block}
+  figure.shot figcaption{
+    padding:14px 20px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);
+  }
+
+  /* 下载 */
+  .dl-card{
+    max-width:680px;margin:0 auto;background:#fff;border:1px solid var(--line);
+    border-radius:20px;padding:56px 48px;text-align:center;
+    box-shadow:0 16px 48px rgba(0,0,0,.06);
+  }
+  .dl-card h3{font-size:24px;font-weight:700;margin-bottom:8px}
+  .dl-card .ver{color:var(--muted);font-size:14px;margin-bottom:28px}
+  .dl-meta{text-align:left;margin:32px 0 8px;font-size:14px;color:var(--muted)}
+  .dl-meta li{list-style:none;padding:9px 0;border-top:1px solid var(--line);display:flex;gap:10px}
+  .dl-meta li span.k{flex:0 0 92px;color:var(--text);font-weight:600}
+  .dl-meta code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;background:var(--bg-soft);padding:3px 8px;border-radius:6px;
+    word-break:break-all;
+  }
+  .note{font-size:12.5px;color:var(--muted);margin-top:20px;line-height:1.8}
+
+  /* FAQ */
+  .faq{max-width:760px;margin:0 auto}
+  details{
+    border:1px solid var(--line);border-radius:12px;margin-bottom:12px;
+    background:#fff;overflow:hidden;
+  }
+  summary{
+    padding:18px 24px;cursor:pointer;font-weight:600;font-size:15px;list-style:none;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";font-size:20px;color:var(--muted);font-weight:400}
+  details[open] summary::after{content:"−"}
+  details .a{padding:0 24px 20px;font-size:14px;color:var(--muted)}
+
+  footer{
+    border-top:1px solid var(--line);padding:40px 0;color:var(--muted);font-size:13px;
+  }
+  .foot-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  footer a{text-decoration:none;color:var(--muted)}
+  footer a:hover{color:var(--text)}
+
+  @media (max-width:860px){
+    .hero{padding:72px 0 60px}
+    .hero h1{font-size:42px}
+    .cards{grid-template-columns:1fr}
+    .shots{grid-template-columns:1fr}
+    .nav-links{display:none;position:absolute;top:64px;left:0;right:0;background:#fff;
+      flex-direction:column;align-items:flex-start;padding:12px 24px 20px;gap:4px;
+      border-bottom:1px solid var(--line)}
+    .nav-links.open{display:flex}
+    .nav-links a{padding:10px 0;font-size:15px}
+    .menu-btn{display:block}
+    .step{flex:1 1 40%;margin-bottom:28px}
+    .step:not(:last-child)::after{display:none}
+    section{padding:64px 0}
+    .dl-card{padding:40px 24px}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#">暮冬念春<small>网文创作工作台</small></a>
+    <button class="menu-btn" id="menuBtn" aria-label="菜单">☰</button>
+    <nav class="nav-links" id="navLinks">
+      <a href="#features">功能</a>
+      <a href="#workflow">工作流</a>
+      <a href="#shots">预览</a>
+      <a href="#download">下载</a>
+      <a href="#faq">常见问题</a>
+      <a class="gh" href="https://github.com/monesyilya3-Niko/novel-lab" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="badge">v2.0.1 · MIT 开源 · Windows 桌面版</div>
+    <h1>暮冬念春</h1>
+    <p class="tagline">把优秀小说拆成可复用的结构化资产，再用这些资产驱动 AI 辅助创作。</p>
+    <p class="sub">本地优先 · 完全离线可用 · 你的数据只属于你自己</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="#download">免费下载 Windows 版</a>
+      <a class="btn btn-ghost" href="https://github.com/monesyilya3-Niko/novel-lab" target="_blank" rel="noopener">GitHub 仓库</a>
+    </div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="wrap stats-inner">
+    <div class="stat"><div class="num">v2.0.1</div><div class="lbl">当前版本</div></div>
+    <div class="stat"><div class="num">72</div><div class="lbl">内置资产</div></div>
+    <div class="stat"><div class="num">1237</div><div class="lbl">项测试</div></div>
+    <div class="stat"><div class="num">81</div><div class="lbl">个 API 端点</div></div>
+    <div class="stat"><div class="num">MIT</div><div class="lbl">开源协议</div></div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>功能</h2>
+      <p>从拆书、资产沉淀到辅助写作与质检，一条完整创作链路，一个软件全部搞定。</p>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="icon">📖</div>
+        <h3>拆书引擎</h3>
+        <p>TXT 全本导入，分层采样、五遍扫描，把一本优秀小说拆解为可量化、可复用的结构化资产。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🗂️</div>
+        <h3>资产体系</h3>
+        <p>文风卡、笔法卡、结构观测、商业观测、题材包、桥段库……内置 72 个资产（含 9 个题材包、32 个桥段），开箱即用。</p>
+      </div>
+      <div class="card">
+        <div class="icon">✍️</div>
+        <h3>写作台</h3>
+        <p>把资产注入生成流程：资产注入 → AI 生成 → 一致性与质量双维度改写循环，越写越像你想要的样子。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔍</div>
+        <h3>质检台</h3>
+        <p>单章 12 个维度 100 分制检查，外加全书级质检，问题定位到具体章节，改得有依据。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🧱</div>
+        <h3>题材隔离</h3>
+        <p>不同题材的资产与配置严格隔离，全链路校验，杜绝跨题材污染——这是刻进产品的铁律。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔒</div>
+        <h3>本地优先，零上传</h3>
+        <p>完全本地运行，服务只绑定本机（127.0.0.1）。你的书稿、资产与配置，不会上传到任何地方。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="workflow" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>工作流</h2>
+      <p>六步，把一本好书变成你的创作弹药库。</p>
+    </div>
+    <div class="flow">
+      <div class="step"><div class="n">1</div><h4>导入语料</h4><p>把 TXT 全本小说导入本地书库</p></div>
+      <div class="step"><div class="n">2</div><h4>拆书分析</h4><p>分层采样，五遍扫描，量化拆解</p></div>
+      <div class="step"><div class="n">3</div><h4>资产蒸馏</h4><p>多维度蒸馏为文风卡、桥段等资产</p></div>
+      <div class="step"><div class="n">4</div><h4>万字报告</h4><p>生成万字级分析报告，硬校验把关</p></div>
+      <div class="step"><div class="n">5</div><h4>质量检查</h4><p>单章 12 维打分，全书质检</p></div>
+      <div class="step"><div class="n">6</div><h4>注入写作</h4><p>资产注入，AI 辅助生成与改写</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="shots">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>界面预览</h2>
+      <p>简约高级白，桌面端原生窗口，打开即用。</p>
+    </div>
+    <div class="shots">
+      <figure class="shot">
+        <div class="frame"><img src="screenshots/home.png" alt="暮冬念春 首页概览：项目数据与资产分布"></div>
+        <figcaption>首页概览 —— 项目数据与资产分布一目了然</figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="frame"><img src="screenshots/writing.png" alt="暮冬念春 写作台：资产注入辅助写作"></div>
+        <figcaption>写作台 —— 资产注入，辅助生成与改写</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="download" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>下载</h2>
+      <p>免费，开源，一分钟装好。</p>
+    </div>
+    <div class="dl-card">
+      <h3>Windows 64 位</h3>
+      <div class="ver">v2.0.1 · 约 124 MB · NSIS 安装包</div>
+      <a class="btn btn-primary" href="https://github.com/monesyilya3-Niko/novel-lab/releases/tag/v2.0.1">下载 暮冬念春 v2.0.1</a>
+      <ul class="dl-meta">
+        <li><span class="k">系统要求</span><span>Windows 10 及以上，64 位</span></li>
+        <li><span class="k">安装方式</span><span>双击安装，无需管理员权限</span></li>
+        <li><span class="k">运行环境</span><span>内置 Python 运行时，无需安装任何依赖</span></li>
+        <li><span class="k">SHA256</span><code>ca169f109f7c55b17b432e2ff0b551f679e66d9c771c494ccb69e73a165214c4</code></li>
+      </ul>
+      <p class="note">安装包未做数字签名，首次运行时 Windows SmartScreen 可能会提示"未知发布者"，属正常现象（个人分发无证书），选择"仍要运行"即可。<br>源码与更新日志见 <a href="https://github.com/monesyilya3-Niko/novel-lab" target="_blank" rel="noopener">GitHub 仓库</a>。</p>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>常见问题</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>暮冬念春是免费的吗？</summary>
+        <div class="a">是的。暮冬念春采用 MIT 协议开源，软件本身永久免费，你也可以在 GitHub 上查看、修改与分发源码。</div>
+      </details>
+      <details>
+        <summary>使用时需要联网吗？</summary>
+        <div class="a">不需要。软件完全在本地运行，拆书、蒸馏、写作、质检等核心功能均可离线使用（AI 生成能力取决于你配置的模型）。</div>
+      </details>
+      <details>
+        <summary>我的小说数据会被上传吗？</summary>
+        <div class="a">不会。服务硬绑定本机地址（127.0.0.1），不对外暴露；你的书稿、资产与配置只保存在你自己的电脑上。</div>
+      </details>
+      <details>
+        <summary>需要自己安装 Python 吗？</summary>
+        <div class="a">不需要。Windows 安装包内置了 Python 运行时，双击装完就能用，不用配置任何开发环境。</div>
+      </details>
+      <details>
+        <summary>除了桌面版，还有别的用法吗？</summary>
+        <div class="a">有。桌面版之外还提供 CLI 引擎 novel.py（20 多个中文子命令），适合习惯命令行的用户；开发者也可以直接从源码运行。</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <span>© 2026 暮冬念春</span>
+    <span><a href="https://github.com/monesyilya3-Niko/novel-lab" target="_blank" rel="noopener">GitHub</a>　·　<a href="https://github.com/monesyilya3-Niko/novel-lab/blob/master/LICENSE" target="_blank" rel="noopener">MIT License</a></span>
+  </div>
+</footer>
+
+<script>
+  // 移动端导航
+  var btn = document.getElementById('menuBtn');
+  var links = document.getElementById('navLinks');
+  btn.addEventListener('click', function(){ links.classList.toggle('open'); });
+  links.addEventListener('click', function(e){
+    if(e.target.tagName === 'A') links.classList.remove('open');
+  });
+</script>
+</body>
+</html>
